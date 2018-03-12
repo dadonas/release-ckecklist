@@ -1,0 +1,29 @@
+{
+  "name": "release-ckecklist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./tests/*.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dadonas/release-ckecklist.git"
+  },
+  "author": "Danilo Dadonas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dadonas/release-ckecklist/issues"
+  },
+  "homepage": "https://github.com/dadonas/release-ckecklist#readme",
+  "dependencies": {
+    "gulp-mocha": "^5.0.0",
+    "gulp-nodemon": "^2.2.1",
+    "hapi": "^17.2.2",
+    "mocha": "^5.0.4",
+    "mongoose": "^5.0.9",
+    "should": "^13.2.1",
+    "sinon": "^4.4.2",
+    "supertest": "^3.0.0"
+  }
+}

@@ -1,0 +1,214 @@
+Raise Fault
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RaiseFault async="false" continueOnError="false" enabled="true" name="Invalid-Request">
+    <DisplayName>Invalid Request</DisplayName>
+    <Properties/>
+    <FaultResponse>
+        <Set>
+            <Payload contentType="text/json"/>
+            <StatusCode>{errorCode}</StatusCode>
+            <ReasonPhrase>{userMessage}</ReasonPhrase>
+        </Set>
+    </FaultResponse>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</RaiseFault>
+
+Flow Example
+<Flow name="Energy">
+            <Description/>
+            <Request>
+                <Step>
+                    <Name>Energy-Proxy-Request</Name>
+                </Step>
+                <Step>
+                    <Name>Invalid-Request</Name>
+                    <Condition>errorCode != null</Condition>
+                </Step>
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/energy") and (request.verb = "POST")</Condition>
+        </Flow>
+
+Validation.json
+context.setVariable("developerMessage", null);
+context.setVariable("userMessage", null);
+context.setVariable("errorCode", null);
+
+main();
+
+if (context.getVariable("errorCode") === null) {
+	context.setVariable("routeTo", "debit-note");
+}
+
+function main() {
+	var contentType = context.getVariable("request.header.Content-Type");
+
+	if (isEmpty(contentType)) {
+	 	context.setVariable("developerMessage", "\"Missing header parameter Content-Type\"");
+		context.setVariable("userMessage", "Missing header parameter Content-Type");
+		context.setVariable("errorCode", 400);
+		return;
+	} else if (contentType.toLowerCase().indexOf("application/json") == -1) {
+		context.setVariable("developerMessage", "\"Invalid header parameter Content-Type - it must be filled with value application/json\"");
+		context.setVariable("userMessage", "Invalid header parameter Content-Type - it must be filled with value application/json");
+		context.setVariable("errorCode", 400);
+		return;
+	}
+
+	var requestContent = context.getVariable("request.content");
+
+	if (isEmpty(requestContent)) {
+		context.setVariable("developerMessage", "\"Missing request body\"");
+		context.setVariable("userMessage", "Missing request body");
+		context.setVariable("errorCode", 400);
+		return;
+	}
+
+	try {
+		requestContent = JSON.parse(context.getVariable("request.content"));
+	} catch (err) {
+		context.setVariable("developerMessage", "\"Invalid request body\"");
+		context.setVariable("userMessage", "Invalid request body");
+		context.setVariable("errorCode", 400);
+		return;
+	}
+	
+	headerFieldsValidation(requestContent.debitNote.debitNote);
+	
+	if (requestContent.debitNote.source == 'CONTA_ENERGIA'){
+	    energyFieldsValidation(requestContent.debitNote.debitNote);
+	}
+
+}
+
+function headerFieldsValidation(requestContent){
+    if (isEmpty(requestContent.branchOffice)){
+        context.setVariable("developerMessage", "\"Missing attribute branchOffice\"");
+        context.setVariable("userMessage", "Field branchOffice is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    if (isEmpty(requestContent.cpfCnpj)){
+        context.setVariable("developerMessage", "\"Missing attribute cpfCnpj\"");
+        context.setVariable("userMessage", "Field cpfCnpj is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    if (isEmpty(requestContent.grossTotalAmount)){
+        context.setVariable("developerMessage", "\"Missing attribute grossTotalAmount\"");
+        context.setVariable("userMessage", "Field grossTotalAmount is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+}
+
+function energyFieldsValidation(requestContent){
+    //attribute2
+    if (isEmpty(requestContent.kilowatts)){
+        context.setVariable("developerMessage", "\"Missing attribute kilowatts\"");
+        context.setVariable("userMessage", "Field kilowatts is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute3
+    if (isEmpty(requestContent.instalation)){
+        context.setVariable("developerMessage", "\"Missing attribute instalation\"");
+        context.setVariable("userMessage", "Field instalation is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute4
+    if (isEmpty(requestContent.reference)){
+        context.setVariable("developerMessage", "\"Missing attribute reference\"");
+        context.setVariable("userMessage", "Field reference is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute5
+    if (isEmpty(requestContent.dueDate)){
+        context.setVariable("developerMessage", "\"Missing attribute dueDate\"");
+        context.setVariable("userMessage", "Field dueDate is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute6
+    if (isEmpty(requestContent.icmsRecovery)){
+        context.setVariable("developerMessage", "\"Missing attribute icmsRecovery\"");
+        context.setVariable("userMessage", "Field icmsRecovery is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute7
+    if (isEmpty(requestContent.generation)){
+        context.setVariable("developerMessage", "\"Missing attribute generation\"");
+        context.setVariable("userMessage", "Field generation is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute8
+    if (isEmpty(requestContent.automaticDebt)){
+        context.setVariable("developerMessage", "\"Missing attribute automaticDebt\"");
+        context.setVariable("userMessage", "Field automaticDebt is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute9
+    if (isEmpty(requestContent.energyRate)){
+        context.setVariable("developerMessage", "\"Missing attribute energyRate\"");
+        context.setVariable("userMessage", "Field energyRate is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute10
+    if (isEmpty(requestContent.reactiveEnergy)){
+        context.setVariable("developerMessage", "\"Missing attribute reactiveEnergy\"");
+        context.setVariable("userMessage", "Field reactiveEnergy is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    //attribute11
+    if (isEmpty(requestContent.publicRate)){
+        context.setVariable("developerMessage", "\"Missing attribute publicRate\"");
+        context.setVariable("userMessage", "Field publicRate is required and can not be empty");
+        context.setVariable("errorCode", 400);
+        return;
+    }
+    
+    for (var i = 0; i < requestContent.lines.line.length; i++){
+        var line = requestContent.lines.line[i];
+        
+        if (isEmpty(line.pisAmount)){
+            context.setVariable("developerMessage", "\"Missing attribute line[" + i + "].pisAmount\"");
+            context.setVariable("userMessage", "Field pisAmount is required and can not be empty");
+            context.setVariable("errorCode", 400);
+            return;
+        }
+        
+        if (isEmpty(line.cofinsAmount)){
+            context.setVariable("developerMessage", "\"Missing attribute line[" + i + "].cofinsAmount\"");
+            context.setVariable("userMessage", "Field cofinsAmount is required and can not be empty");
+            context.setVariable("errorCode", 400);
+            return;
+        }
+        
+        if (isEmpty(line.icmsAmount)){
+            context.setVariable("developerMessage", "\"Missing attribute line[" + i + "].icmsAmount\"");
+            context.setVariable("userMessage", "Field icmsAmount is required and can not be empty");
+            context.setVariable("errorCode", 400);
+            return;
+        }
+        
+    }
+    
+}
